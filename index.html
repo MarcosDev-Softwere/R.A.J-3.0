@@ -24,13 +24,17 @@
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
 
-    textarea {
+    textarea, input[type="password"] {
       width: 100%;
-      height: 160px;
       padding: 1rem;
       font-size: 1rem;
       border-radius: 6px;
       border: 1px solid #ccc;
+      margin-bottom: 1rem;
+    }
+
+    textarea {
+      height: 160px;
       resize: none;
     }
 
@@ -60,6 +64,12 @@
     button:last-of-type:hover {
       background-color: #bbb;
     }
+
+    .feedback {
+      margin-top: 1rem;
+      font-weight: bold;
+      color: #d9534f;
+    }
   </style>
 </head>
 <body>
@@ -68,18 +78,32 @@
 
   <div class="form-container">
     <form id="orcamentoForm">
-      <label for="orcamento">Descrição do Orçamento:</label><br>
-      <textarea id="orcamento" placeholder="Digite aqui..."></textarea><br>
+      <label for="orcamento">Descrição do Orçamento:</label>
+      <textarea id="orcamento" placeholder="Digite aqui..."></textarea>
+
+      <label for="senhaEnvio">Senha para Enviar:</label>
+      <input type="password" id="senhaEnvio" placeholder="Digite a senha de envio">
+
       <button type="submit">Enviar</button>
       <button type="button" onclick="limpar()">Limpar e Reescrever</button>
+
+      <label for="senhaApagar">Senha para Apagar:</label>
+      <input type="password" id="senhaApagar" placeholder="Digite a senha para apagar">
     </form>
+
+    <div class="feedback" id="mensagem"></div>
   </div>
 
   <script>
     const form = document.getElementById("orcamentoForm");
     const textarea = document.getElementById("orcamento");
+    const senhaEnvioInput = document.getElementById("senhaEnvio");
+    const senhaApagarInput = document.getElementById("senhaApagar");
+    const mensagem = document.getElementById("mensagem");
 
-    // Ao carregar, verifica se existe orçamento salvo
+    const senhaEnvio = "1234"; // senha para enviar
+    const senhaApagar = "4321"; // senha para apagar
+
     window.addEventListener("load", function () {
       const textoSalvo = localStorage.getItem("orcamentoTexto");
       if (textoSalvo) {
@@ -91,17 +115,34 @@
     form.addEventListener("submit", function (event) {
       event.preventDefault();
       const texto = textarea.value.trim();
-      if (texto) {
+      const senhaDigitada = senhaEnvioInput.value;
+
+      if (!texto) {
+        mensagem.textContent = "Por favor, escreva o orçamento.";
+        return;
+      }
+
+      if (senhaDigitada === senhaEnvio) {
         localStorage.setItem("orcamentoTexto", texto);
         textarea.disabled = true;
+        mensagem.textContent = "Orçamento enviado com sucesso!";
+      } else {
+        mensagem.textContent = "Senha de envio incorreta.";
       }
     });
 
     function limpar() {
-      localStorage.removeItem("orcamentoTexto");
-      textarea.disabled = false;
-      textarea.value = "";
-      textarea.focus();
+      const senhaDigitada = senhaApagarInput.value;
+
+      if (senhaDigitada === senhaApagar) {
+        localStorage.removeItem("orcamentoTexto");
+        textarea.disabled = false;
+        textarea.value = "";
+        mensagem.textContent = "Orçamento apagado.";
+        textarea.focus();
+      } else {
+        mensagem.textContent = "Senha de apagar incorreta.";
+      }
     }
   </script>
 
